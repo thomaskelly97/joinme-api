@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String            @id @default(uuid())
+  userFullName         String
+  username             String            @unique
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  events               Event[]
+  rsvps                EventRsvp[]
+  communities          Community[]
+  communityMemberships CommunityMember[]
+}
+
+model Event {
+  id              String      @id @default(uuid())
+  name            String
+  description     String
+  date            DateTime
+  category        String
+  capacity        Int?
+  attendeeCount   Int         @default(0)
+  address         String      @default("")
+  latitude        Float
+  longitude       Float
+  authorName      String      @default("")
+  eventPhoto      String      @default("")
+  createdByUserId String?
+  createdBy       User?       @relation(fields: [createdByUserId], references: [id])
+  rsvps           EventRsvp[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Community {
+  id              String            @id @default(uuid())
+  name            String
+  bio             String
+  latitude        Float
+  longitude       Float
+  communityPhoto  String            @default("")
+  createdByUserId String?
+  createdBy       User?             @relation(fields: [createdByUserId], references: [id])
+  members         CommunityMember[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model CommunityMember {
+  id          String    @id @default(uuid())
+  userId      String
+  communityId String
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  community   Community @relation(fields: [communityId], references: [id])
+
+  @@unique([userId, communityId])
+}
+
+model EventRsvp {
+  id        String   @id @default(uuid())
+  userId    String
+  eventId   String
+  status    String   // "going" | "interested"
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}

@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Event" ADD COLUMN     "eventPhoto" TEXT NOT NULL DEFAULT '',
+ALTER COLUMN "capacity" DROP NOT NULL,
+ALTER COLUMN "authorName" SET DEFAULT '';
